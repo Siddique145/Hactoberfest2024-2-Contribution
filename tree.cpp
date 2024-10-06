@@ -2,118 +2,130 @@
 #include <list>
 using namespace std;
 
-struct node {
+struct Node {
     int val;
-    node *left;
-    node *right;
+    Node* left;
+    Node* right;
+
+    Node(int value) : val(value), left(nullptr), right(nullptr) {}
 };
 
-void CreateTree(node *curr, node *n, int x, char pos) {
-    if (n != NULL) {
-        char ch;
-        cout << "\nLeft or Right of " << n->val << " : ";
-        cin >> ch;
-        if (ch == 'l')
-            CreateTree(n, n->left, x, ch);
-        else if (ch == 'r')
-            CreateTree(n, n->right, x, ch);
-    } else {
-        node *t = new node;
-        t->val = x;
-        t->left = NULL;
-        t->right = NULL;
-        if (pos == 'l') {
-            curr->left = t;
-        } else if (pos == 'r') {
-            curr->right = t;
+class BinaryTree {
+public:
+    Node* root;
+
+    BinaryTree() : root(nullptr) {}
+
+    void insert(int value, char pos) {
+        if (root == nullptr) {
+            root = new Node(value);
+        } else {
+            insertRec(root, value, pos);
         }
     }
-}
 
-void BFT(node *n) {
-    list<node *> queue;
+    void breadthFirstTraversal() const {
+        if (!root) return;
 
-    queue.push_back(n);
+        list<Node*> queue;
+        queue.push_back(root);
 
-    while (!queue.empty()) {
-        n = queue.front();
-        cout << n->val << "  ";
-        queue.pop_front();
+        while (!queue.empty()) {
+            Node* current = queue.front();
+            cout << current->val << " ";
+            queue.pop_front();
 
-        if (n->left != NULL)
-            queue.push_back(n->left);
-        if (n->right != NULL)
-            queue.push_back(n->right);
+            if (current->left) queue.push_back(current->left);
+            if (current->right) queue.push_back(current->right);
+        }
     }
-}
 
-void Pre(node *n) {
-    if (n != NULL) {
-        cout << n->val << "  ";
-        Pre(n->left);
-        Pre(n->right);
+    void preorderTraversal(Node* node) const {
+        if (node) {
+            cout << node->val << " ";
+            preorderTraversal(node->left);
+            preorderTraversal(node->right);
+        }
     }
-}
 
-void In(node *n) {
-    if (n != NULL) {
-        In(n->left);
-        cout << n->val << "  ";
-        In(n->right);
+    void inorderTraversal(Node* node) const {
+        if (node) {
+            inorderTraversal(node->left);
+            cout << node->val << " ";
+            inorderTraversal(node->right);
+        }
     }
-}
 
-void Post(node *n) {
-    if (n != NULL) {
-        Post(n->left);
-        Post(n->right);
-        cout << n->val << "  ";
+    void postorderTraversal(Node* node) const {
+        if (node) {
+            postorderTraversal(node->left);
+            postorderTraversal(node->right);
+            cout << node->val << " ";
+        }
     }
-}
+
+private:
+    void insertRec(Node* current, int value, char pos) {
+        if (pos == 'l') {
+            if (current->left == nullptr) {
+                current->left = new Node(value);
+            } else {
+                cout << "Left child already exists. Choose another position.\n";
+            }
+        } else if (pos == 'r') {
+            if (current->right == nullptr) {
+                current->right = new Node(value);
+            } else {
+                cout << "Right child already exists. Choose another position.\n";
+            }
+        } else {
+            cout << "Invalid position. Use 'l' for left or 'r' for right.\n";
+        }
+    }
+};
 
 int main() {
-    int value;
-    int ch;
-    node *root = new node;
-    cout << "\nEnter the value of root node :";
-    cin >> value;
-    root->val = value;
-    root->left = NULL;
-    root->right = NULL;
-    do {
-        cout << "\n1. Insert";
-        cout << "\n2. Breadth First";
-        cout << "\n3. Preorder Depth First";
-        cout << "\n4. Inorder Depth First";
-        cout << "\n5. Postorder Depth First";
+    BinaryTree tree;
+    int choice, value;
+    char pos;
 
-        cout << "\nEnter Your Choice : ";
-        cin >> ch;
-        switch (ch) {
+    cout << "Enter the value of root node: ";
+    cin >> value;
+    tree.insert(value, 'r'); // Insert root
+
+    do {
+        cout << "\n1. Insert\n2. Breadth First Traversal\n3. Preorder Traversal\n4. Inorder Traversal\n5. Postorder Traversal\n0. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
         case 1:
-            int x;
-            char pos;
-            cout << "\nEnter the value to be Inserted : ";
-            cin >> x;
-            cout << "\nLeft or Right of Root : ";
+            cout << "Enter the value to be inserted: ";
+            cin >> value;
+            cout << "Left or Right of Root (l/r): ";
             cin >> pos;
-            if (pos == 'l')
-                CreateTree(root, root->left, x, pos);
-            else if (pos == 'r')
-                CreateTree(root, root->right, x, pos);
+            tree.insert(value, pos);
             break;
         case 2:
-            BFT(root);
+            tree.breadthFirstTraversal();
             break;
         case 3:
-            Pre(root);
+            tree.preorderTraversal(tree.root);
             break;
         case 4:
-            In(root);
+            tree.inorderTraversal(tree.root);
             break;
         case 5:
-            Post(root);
+            tree.postorderTraversal(tree.root);
+            break;
+        case 0:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Invalid choice. Please try again.\n";
             break;
         }
-    } while (ch != 0);
+    } while (choice != 0);
+
+    return 0;
 }
